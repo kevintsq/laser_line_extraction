@@ -1,0 +1,6 @@
+<launch>
+  <include file="$(find laser_line_extraction)/launch/example.launch" />
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find laser_line_extraction)/rviz/view.rviz" />
+</launch>
+

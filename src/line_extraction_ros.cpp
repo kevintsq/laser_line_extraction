@@ -2,7 +2,7 @@
 #include <cmath>
 #include <ros/console.h>
 
-
+#define PI 3.141592653589
 namespace line_extraction
 {
 
@@ -131,6 +131,16 @@ void LineExtractionROS::loadParameters()
   ROS_DEBUG("*************************************");
 }
 
+static inline double normalize_azimuth(double azimuth) {
+  if (azimuth <= -180) {
+    return azimuth + 360;
+  } else if (azimuth > 180) {
+    return azimuth - 360;
+  } else {
+    return azimuth;
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Populate messages
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,11 +150,11 @@ void LineExtractionROS::populateLineSegListMsg(const std::vector<Line> &lines,
   for (std::vector<Line>::const_iterator cit = lines.begin(); cit != lines.end(); ++cit)
   {
     laser_line_extraction::LineSegment line_msg;
-    line_msg.angle = cit->getAngle(); 
+    line_msg.angle = normalize_azimuth(cit->getAngle() * 180 / PI - 180); 
     line_msg.radius = cit->getRadius(); 
     line_msg.covariance = cit->getCovariance(); 
-    line_msg.start = cit->getStart(); 
-    line_msg.end = cit->getEnd(); 
+    line_msg.start = {(float) cit->getStart()[1], (float) -cit->getStart()[0]}; 
+    line_msg.end = {(float) cit->getEnd()[1], (float) -cit->getEnd()[0]}; 
     line_list_msg.line_segments.push_back(line_msg);
   }
   line_list_msg.header.frame_id = frame_id_;
@@ -158,8 +168,8 @@ void LineExtractionROS::populateMarkerMsg(const std::vector<Line> &lines,
   marker_msg.id = 0;
   marker_msg.type = visualization_msgs::Marker::LINE_LIST;
   marker_msg.scale.x = 0.1;
-  marker_msg.color.r = 1.0;
-  marker_msg.color.g = 0.0;
+  marker_msg.color.r = 0.0;
+  marker_msg.color.g = 1.0;
   marker_msg.color.b = 0.0;
   marker_msg.color.a = 1.0;
   for (std::vector<Line>::const_iterator cit = lines.begin(); cit != lines.end(); ++cit)
