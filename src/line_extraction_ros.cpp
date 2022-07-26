@@ -150,11 +150,11 @@ void LineExtractionROS::populateLineSegListMsg(const std::vector<Line> &lines,
   for (std::vector<Line>::const_iterator cit = lines.begin(); cit != lines.end(); ++cit)
   {
     laser_line_extraction::LineSegment line_msg;
-    line_msg.angle = normalize_azimuth(cit->getAngle() * 180 / PI - 180); 
+    line_msg.angle = normalize_azimuth(cit->getAngle() * 180 / PI); 
     line_msg.radius = cit->getRadius(); 
     line_msg.covariance = cit->getCovariance(); 
-    line_msg.start = {(float) cit->getStart()[1], (float) -cit->getStart()[0]}; 
-    line_msg.end = {(float) cit->getEnd()[1], (float) -cit->getEnd()[0]}; 
+    line_msg.start = {(float) -cit->getStart()[1], (float) cit->getStart()[0]}; 
+    line_msg.end = {(float) -cit->getEnd()[1], (float) cit->getEnd()[0]}; 
     line_list_msg.line_segments.push_back(line_msg);
   }
   line_list_msg.header.frame_id = frame_id_;
